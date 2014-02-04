@@ -1,25 +1,58 @@
 package kymmel.jaagup.lol.spec;
 
-import java.io.*;
+import kymmel.jaagup.misc.IO;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Search {
 
-    public static final String FILE = "stuff";
-    public static final String CHARSTR = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-. ";
+    public static final byte[] CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-. ".getBytes();
 
     public static void main(String[] args) throws IOException {
 
-        byte[] chars = CHARSTR.getBytes();
+        /*
 
-        byte[] fileBytes = readFileBytes(FILE);
-        ArrayList<String> results = new ArrayList<String>();
+        for(int j = 5; j < 44; j++) {
+
+            byte[] fileBytes = IO.readFileBytes("EUN1/750447783/" + j + ".keyframe");
+            System.out.println("Keyframe number " + j);
+
+            int[] indexes = substrIndexes(fileBytes, "Turret_".getBytes());
+
+            for(int i = 0; i < indexes.length; i++) {
+
+                int index = indexes[i];
+                byte[] data = new byte[180];
+
+                data = Arrays.copyOfRange(fileBytes, index - 5, index + 175);
+
+                IO.writeFile("keyframeTurrets/" + String.format("keyframe%02d.id%02d", j, data[0]), data);
+
+            }
+
+        }
+
+        */
+
+        String[] strings = listStrings(IO.readFileBytes("EUN1/750447783/16.keyframe"));
+
+        for(String string : strings)
+            System.out.println(string);
+
+    }
+
+    public static String[] listStrings(byte[] data) {
+
+        ArrayList<String> strings = new ArrayList<String>();
+
         ByteArrayOutputStream baos = null;
         int curLen = 0;
 
-        for(int i = 0; i < fileBytes.length; i++) {
+        for(int i = 0; i < data.length; i++) {
 
-            boolean isASCII = contains(chars, fileBytes[i]);
+            boolean isASCII = contains(CHARS, data[i]);
 
             if(isASCII) {
 
@@ -27,16 +60,12 @@ public class Search {
                     baos = new ByteArrayOutputStream();
 
                 curLen++;
-                baos.write(fileBytes[i]);
+                baos.write(data[i]);
 
             } else {
 
-                if(curLen > 3) {
-
-                    results.add(baos.toString());
-                    System.out.println(baos.toString());
-
-                }
+                if(curLen > 3)
+                    strings.add(baos.toString());
 
                 curLen = 0;
 
@@ -44,22 +73,34 @@ public class Search {
 
         }
 
-
+        return strings.toArray(new String[strings.size()]);
 
     }
 
-    public static byte[] readFileBytes(String file) throws IOException {
+    public static int[] substrIndexes(byte[] data, byte[] substr) {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        BufferedInputStream httpIn = new BufferedInputStream(new FileInputStream(file));
-        byte[] buffer = new byte[1024];
-        int n;
+        ArrayList<Integer> indexes = new ArrayList<Integer>();
 
-        while((n = httpIn.read(buffer)) != -1)
-            baos.write(buffer, 0, n);
+        int i, j;
 
-        httpIn.close();
-        return baos.toByteArray();
+        for(i = 0; i <= data.length - substr.length; i++) {
+
+            for(j = 0; j < substr.length; j++)
+                if(data[i + j] != substr[j])
+                    break;
+
+            if(j == substr.length)
+                indexes.add(i);
+
+        }
+
+        System.out.println(indexes.size());
+
+        int[] pIndexes = new int[indexes.size()];
+        for(i = 0; i < indexes.size(); i++)
+            pIndexes[i] = indexes.get(i).intValue();
+
+        return pIndexes;
 
     }
 

@@ -3,18 +3,16 @@ package kymmel.jaagup.lol.spec;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import kymmel.jaagup.misc.Crypto;
+import kymmel.jaagup.misc.IO;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.*;
-import java.net.URL;
+import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.zip.GZIPInputStream;
 
 public class Downloader {
 
@@ -37,7 +35,7 @@ public class Downloader {
 
                 System.out.println("Downloading chunk " + chunkInfo.chunkId);
 
-                writeFile(
+                IO.writeFile(
                         metaData.platformId + "/" + metaData.gameId + "/" + chunkInfo.chunkId + ".chunk",
                         getChunk(metaData, chunkInfo.chunkId)
                 );
@@ -50,7 +48,7 @@ public class Downloader {
 
                 System.out.println("Downloading keyframe " + chunkInfo.keyFrameId);
 
-                writeFile(
+                IO.writeFile(
                         metaData.platformId + "/" + metaData.gameId + "/" + chunkInfo.keyFrameId + ".keyframe",
                         getKeyFrame(metaData, chunkInfo.keyFrameId)
                 );
@@ -69,89 +67,47 @@ public class Downloader {
 
     }
 
-    public static byte[] readHttpBytes(String url) throws IOException {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        InputStream httpIn = new URL(url).openStream();
-        byte[] buffer = new byte[1024];
-        int n;
 
-        while((n = httpIn.read(buffer)) != -1)
-            baos.write(buffer, 0, n);
 
-        httpIn.close();
-        return baos.toByteArray();
-
-    }
-
-    public static String readHttpString(String url) throws IOException {
-
-        return new String(readHttpBytes(url), "UTF-8");
-
-    }
-
-    public static byte[] decrypt(byte[] encrypted, byte[] key) throws NoSuchPaddingException, NoSuchAlgorithmException,
-            BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
-
-        Cipher cipher = Cipher.getInstance("Blowfish/ECB/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "Blowfish"));
-
-        return cipher.doFinal(encrypted);
-
-    }
-
-    public static byte[] decompress(byte[] compressed) throws IOException {
-
-        GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(compressed));
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int n;
-
-        while((n = gis.read(buffer)) != -1)
-            baos.write(buffer, 0, n);
-
-        return baos.toByteArray();
-
-    }
 
     public static byte[] getKeyFrame(MetaData metaData, int chunkId) throws IOException, IllegalBlockSizeException,
             InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
 
-        byte[] encryptedChunk = readHttpBytes(
+        byte[] encryptedChunk = IO.readHttpBytes(
                 BASE_URL + "consumer/getKeyFrame/" + metaData.platformId + "/" + metaData.gameId + "/" + chunkId +
-                "/token/"
+                        "/token/"
         );
 
-        byte[] realKey = decrypt(
+        byte[] realKey = Crypto.decrypt(
                 Base64.decodeBase64(metaData.encryptionKey),
                 Integer.toString(metaData.gameId).getBytes()
         );
 
-        return decompress(decrypt(encryptedChunk, realKey));
+        return Crypto.decompress(Crypto.decrypt(encryptedChunk, realKey));
 
     }
 
     public static byte[] getChunk(MetaData metaData, int chunkId) throws IOException, IllegalBlockSizeException,
             InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
 
-        byte[] encryptedChunk = readHttpBytes(
+        byte[] encryptedChunk = IO.readHttpBytes(
                 BASE_URL + "consumer/getGameDataChunk/" + metaData.platformId + "/" + metaData.gameId + "/" + chunkId +
-                "/token/"
+                        "/token/"
         );
 
-        byte[] realKey = decrypt(
+        byte[] realKey = Crypto.decrypt(
                 Base64.decodeBase64(metaData.encryptionKey),
                 Integer.toString(metaData.gameId).getBytes()
         );
 
-        return decompress(decrypt(encryptedChunk, realKey));
+        return Crypto.decompress(Crypto.decrypt(encryptedChunk, realKey));
 
     }
 
     public static MetaData[] getFeaturedGames() throws IOException {
 
-        JsonObject gameRoot = new JsonParser().parse(readHttpString(
+        JsonObject gameRoot = new JsonParser().parse(IO.readHttpString(
                 BASE_URL + "featured"
         )).getAsJsonObject();
 
@@ -174,26 +130,9 @@ public class Downloader {
 
     }
 
-    public static void writeFile(String fileName, byte[] bytes) throws IOException {
-
-        if(fileName.lastIndexOf("/") > 0)
-            new File(fileName).getParentFile().mkdirs();
-
-        FileOutputStream fileOut = new FileOutputStream(fileName);
-        fileOut.write(bytes);
-        fileOut.close();
-
-    }
-
-    public static void writeFile(String fileName, String data) throws IOException {
-
-        writeFile(fileName, data.getBytes("UTF-8"));
-
-    }
-
     public static ChunkInfo getChunkInfo(MetaData metaData) throws IOException {
 
-        JsonObject chunkRoot = new JsonParser().parse(readHttpString(
+        JsonObject chunkRoot = new JsonParser().parse(IO.readHttpString(
                 BASE_URL + "consumer/getLastChunkInfo/" + metaData.platformId + "/" + metaData.gameId + "/1/token/"
         )).getAsJsonObject();
 
