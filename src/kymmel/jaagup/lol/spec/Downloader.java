@@ -1,6 +1,6 @@
 package kymmel.jaagup.lol.spec;
 
-import kymmel.jaagup.misc.IO;
+import kymmel.jaagup.lol.spec.misc.IO;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -14,7 +14,9 @@ public class Downloader implements Runnable {
     public static void main(String[] args) throws IOException, NoSuchPaddingException, NoSuchAlgorithmException,
             InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InterruptedException {
 
-        Spectator[] specs = Rest.getFeaturedGames("EUN1");
+        Rest Eune = new Rest("EUN1", Rest.servers.get("EUN1"));
+
+        Spectator[] specs = Eune.getFeaturedGames();
 
         for(Spectator spec : specs) {
 
@@ -51,7 +53,7 @@ public class Downloader implements Runnable {
                     System.out.println(spec.gameId + ": Downloading chunk " + chunkInfo.chunkId);
 
                     IO.writeFile(
-                            "analysis/" + spec.platformId + "." + spec.gameId + "." + chunkInfo.chunkId + ".chunk",
+                            "analysis/chunks/" + spec.platformId + "." + spec.gameId + "." + chunkInfo.chunkId + ".chunk",
                             spec.getChunk(chunkInfo.chunkId)
                     );
 
@@ -64,7 +66,7 @@ public class Downloader implements Runnable {
                     System.out.println(spec.gameId + ": Downloading keyframe " + chunkInfo.keyFrameId);
 
                     IO.writeFile(
-                            "analysis/" + spec.platformId + "." + spec.gameId + "." + chunkInfo.keyFrameId + ".keyframe",
+                            "analysis/keyframes/" + spec.platformId + "." + spec.gameId + "." + chunkInfo.keyFrameId + ".keyframe",
                             spec.getKeyFrame(chunkInfo.keyFrameId)
                     );
 

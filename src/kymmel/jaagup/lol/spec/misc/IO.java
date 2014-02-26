@@ -1,4 +1,4 @@
-package kymmel.jaagup.misc;
+package kymmel.jaagup.lol.spec.misc;
 
 import java.io.*;
 import java.net.URL;

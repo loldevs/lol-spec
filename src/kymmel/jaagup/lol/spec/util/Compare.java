@@ -1,6 +1,6 @@
-package kymmel.jaagup.lol.spec;
+package kymmel.jaagup.lol.spec.util;
 
-import kymmel.jaagup.misc.IO;
+import kymmel.jaagup.lol.spec.misc.IO;
 
 import java.io.File;
 import java.io.IOException;

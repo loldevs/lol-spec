@@ -2,8 +2,8 @@ package kymmel.jaagup.lol.spec;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import kymmel.jaagup.misc.Crypto;
-import kymmel.jaagup.misc.IO;
+import kymmel.jaagup.lol.spec.misc.Crypto;
+import kymmel.jaagup.lol.spec.misc.IO;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.BadPaddingException;
@@ -12,21 +12,8 @@ import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Spectator {
-
-    public static Map<String, String> servers = new HashMap<String, String>() {
-        {
-
-            put("NA1", "http://spectator.na.lol.riotgames.com:80/observer-mode/rest/");
-            put("EUW1", "http://spectator.eu.lol.riotgames.com:8088/observer-mode/rest/");
-            put("EUN1", "http://spectator.eu.lol.riotgames.com:8088/observer-mode/rest/");
-            put("PBE1", "http://spectator.pbe1.lol.riotgames.com:8088/observer-mode/rest/");
-
-        }
-    };
 
     public int gameId;
     public String platformId;

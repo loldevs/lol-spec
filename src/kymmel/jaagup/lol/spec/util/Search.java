@@ -1,6 +1,6 @@
-package kymmel.jaagup.lol.spec;
+package kymmel.jaagup.lol.spec.util;
 
-import kymmel.jaagup.misc.IO;
+import kymmel.jaagup.lol.spec.misc.IO;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -64,7 +64,7 @@ public class Search {
 
             } else {
 
-                if(curLen > 3)
+                if(curLen > 3 && baos != null)
                     strings.add(baos.toString());
 
                 curLen = 0;
