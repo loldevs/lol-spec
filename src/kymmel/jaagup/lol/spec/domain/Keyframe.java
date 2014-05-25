@@ -1,6 +1,8 @@
-package kymmel.jaagup.lol.spec;
+package kymmel.jaagup.lol.spec.domain;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Keyframe {
@@ -67,12 +69,13 @@ public class Keyframe {
 
         }
 
+        protected int playerId;
         protected int entityId;
         protected String summoner;
         protected String champion;
         protected Map<Integer, Integer> runes = new HashMap<Integer, Integer>();
         protected Map<Integer, Integer> talents = new HashMap<Integer, Integer>();
-        protected Item[] items = new Item[9];
+        protected Item[] items = new Item[10];
         protected Ability[] abililities = new Ability[4];
 
         public void setEntityId(int entityId) {
@@ -134,24 +137,31 @@ public class Keyframe {
             return abililities;
         }
 
+        public int getPlayerId() {
+            return playerId;
+        }
+
+        public void setPlayerId(int playerId) {
+            this.playerId = playerId;
+        }
     }
 
     protected float timeStamp;
-    protected Map<Integer, Player> players = new HashMap<Integer, Player>();
+    protected List<Player> players = new ArrayList<Player>();
 
     public void setTimeStamp(float timeStamp) {
         this.timeStamp = timeStamp;
     }
 
-    public void setPlayer(int playerNum, Player player) {
-        players.put(playerNum, player);
+    public void addPlayer(Player player) {
+        players.add(player);
     }
 
     public float getTimeStamp() {
         return timeStamp;
     }
 
-    public Map<Integer, Player> getPlayers() {
+    public List<Player> getPlayers() {
         return players;
     }
 }

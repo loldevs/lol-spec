@@ -1,9 +1,9 @@
-package kymmel.jaagup.lol.spec.misc;
+package kymmel.jaagup.lol.spec.util;
 
 import java.io.*;
 import java.net.URL;
 
-public class IO {
+public class FileUtil {
 
     public static byte[] readHttpBytes(String url) throws IOException {
 

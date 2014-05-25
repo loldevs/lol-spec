@@ -1,8 +1,10 @@
 package kymmel.jaagup.lol.spec;
 
 
-import kymmel.jaagup.lol.spec.misc.ByteInputStream;
-import kymmel.jaagup.lol.spec.misc.IO;
+import kymmel.jaagup.lol.spec.domain.Keyframe;
+import kymmel.jaagup.lol.spec.domain.ByteInputStream;
+import kymmel.jaagup.lol.spec.util.ByteUtil;
+import kymmel.jaagup.lol.spec.util.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,11 +43,13 @@ public class Parser {
             }, 0x100);
             if(seek < 0)
                 break;
-            stream.skip(seek);
+            System.out.println(ByteUtil.toHexString(stream.nextByte()) + " " + ByteUtil.toHexString(stream.nextByte()));
+            stream.skip(seek-0x2);
             intMarker = stream.nextInt();
             player.setEntityId(intMarker - 0x40000000);
 
-            keyframe.setPlayer(stream.nextByte(), player);
+            keyframe.addPlayer(player);
+            player.setPlayerId(stream.nextInt());
             stream.skip(0xD);
 
             //Summoner name
@@ -121,11 +125,11 @@ public class Parser {
             seek = stream.skipTo(
                     new byte[][] {
                             new byte[] {
-                                    (byte) 0xB3, (byte) 0x00, (byte) 0x65, (byte) 0xFE,
+                                    (byte) 0xB3, (byte) 0x00, (byte) 0x70, (byte) 0xFE,
                                     (byte) 0x00, (byte) 0x0C, (byte) 0x01
                             },
                             new byte[] {
-                                    (byte) 0xB3, (byte) 0x01, (byte) 0x65, (byte) 0xFE,
+                                    (byte) 0xB3, (byte) 0x01, (byte) 0x70, (byte) 0xFE,
                                     (byte) 0x00, (byte) 0x0C, (byte) 0x01
                             }
                     },
@@ -157,6 +161,11 @@ public class Parser {
                 player.getItems()[i].setCooldown(stream.nextFloat());
             }
 
+            //debug
+            //System.out.print("\t" + p + " " + ByteUtils.toHexString(stream.read(0xC)));
+            stream.skip(-0xC);
+            i = stream.getIndex();
+
             //Abilities header
             seek = stream.skipTo(new byte[][]{
                     new byte[]{(byte) 0xB3, (byte) 0x00, (byte) 0x03, (byte) 0x15},
@@ -172,6 +181,9 @@ public class Parser {
                         stream.getIndex()
                 );
             stream.skip(seek);
+
+            //debug
+            //System.out.println(": " + Integer.toHexString(stream.getIndex() - i));
 
             for(i = 0; i < 4; i++) {
                 stream.skip(0x1);
@@ -220,62 +232,23 @@ public class Parser {
         for(File file : files) {
 
             try {
-
-                long startTime = System.currentTimeMillis();
-                Keyframe keyframe = keyframe(IO.readFileBytes(file.getCanonicalPath()));
-                parseTime += System.currentTimeMillis() - startTime;
+                System.out.println(file.getName());
                 parseNum++;
-
+                long startTime = System.currentTimeMillis();
+                Keyframe keyframe = keyframe(FileUtil.readFileBytes(file.getCanonicalPath()));
+                parseTime += System.currentTimeMillis() - startTime;
                 ArrayList<String> results = new ArrayList<String>();
-
-                for(int key : keyframe.getPlayers().keySet()) {
-
-                    Keyframe.Player player = keyframe.getPlayers().get(key);
-
-                    for(Keyframe.Player.Item item : player.getItems()) {
-
-                        if(item.cooldown > 0.0f) {
-
-                            if(item.getSlot() < 100)
-                                continue;
-
-                            results.add(player.getChampion() +
-                                    ": item " + item.getItemId() + " (slot " + item.getSlot() +
-                                    ") has cooldown of " + item.getCooldown() + " seconds");
-
-                        }
-
-                    }
-
-                    for(int i = 0; i < player.getAbililities().length; i++) {
-
-                        Keyframe.Player.Ability ability = player.getAbililities()[i];
-
-                        if(ability.unknown > 0.0f) {
-
-                            results.add(player.getChampion() +
-                                    ": ability " + i + " (level " + ability.getLevel() +
-                                    ") has unknown value of " + ability.getUnknown());
-
-                        }
-
-                    }
-
-                }
-
             } catch(ParseException e) {
-
                 System.err.println("ParseException in " + file.getName());
                 System.err.println("\t" + e.getMessage());
                 failedNum++;
-                break;
-
             }
-
         }
 
         System.out.println("Parsing took " + parseTime + "ms for " + parseNum + " keyframes, avg. " +
-                parseTime / parseNum + "ms/keyframe, while failing to parse " + failedNum + " keyframes.");
+                parseTime / parseNum + "ms/keyframe, while failing to parse " + failedNum + " keyframes (" +
+                ((double)(failedNum) * 100 / parseNum) + "% fail rate)."
+        );
 
     }
 

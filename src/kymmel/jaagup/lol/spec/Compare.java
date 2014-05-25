@@ -1,6 +1,6 @@
-package kymmel.jaagup.lol.spec.util;
+package kymmel.jaagup.lol.spec;
 
-import kymmel.jaagup.lol.spec.misc.IO;
+import kymmel.jaagup.lol.spec.util.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +19,7 @@ public class Compare {
             if(!new File(String.format("keyframe%02d.id02", i)).exists())
                 continue;
 
-            fileDatas.add(IO.readFileBytes(String.format("keyframe%02d.id08", i)));
+            fileDatas.add(FileUtil.readFileBytes(String.format("keyframe%02d.id08", i)));
 
             if(i > 0)
                 for(int j = 0; j < fileDatas.get(i).length; j++)

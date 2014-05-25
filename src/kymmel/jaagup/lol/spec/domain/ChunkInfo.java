@@ -1,4 +1,4 @@
-package kymmel.jaagup.lol.spec;
+package kymmel.jaagup.lol.spec.domain;
 
 public class ChunkInfo {
 

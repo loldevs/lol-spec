@@ -1,6 +1,6 @@
-package kymmel.jaagup.lol.spec.util;
+package kymmel.jaagup.lol.spec;
 
-import kymmel.jaagup.lol.spec.misc.IO;
+import kymmel.jaagup.lol.spec.util.FileUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,7 +36,7 @@ public class Search {
 
         */
 
-        String[] strings = listStrings(IO.readFileBytes("01"));
+        String[] strings = listStrings(FileUtil.readFileBytes("01"));
 
         for(String string : strings)
             System.out.println(string);

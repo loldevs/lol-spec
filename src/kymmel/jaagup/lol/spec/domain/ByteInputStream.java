@@ -1,4 +1,4 @@
-package kymmel.jaagup.lol.spec.misc;
+package kymmel.jaagup.lol.spec.domain;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
@@ -10,9 +10,18 @@ public class ByteInputStream {
 
     protected byte[] data;
     protected int index;
+    protected ByteOrder byteOrder = ByteOrder.nativeOrder();
 
     public ByteInputStream(byte[] data) {
         this.data = data;
+    }
+
+    public ByteOrder getByteOrder() {
+        return byteOrder;
+    }
+
+    public void setByteOrder(ByteOrder byteOrder) {
+        this.byteOrder = byteOrder;
     }
 
     public void skip(int len) {
@@ -35,15 +44,15 @@ public class ByteInputStream {
     }
 
     public short nextShort() {
-        return ByteBuffer.wrap(this.read(2)).order(ByteOrder.LITTLE_ENDIAN).getShort();
+        return ByteBuffer.wrap(this.read(2)).order(byteOrder).getShort();
     }
 
     public int nextInt() {
-        return ByteBuffer.wrap(this.read(4)).order(ByteOrder.LITTLE_ENDIAN).getInt();
+        return ByteBuffer.wrap(this.read(4)).order(byteOrder).getInt();
     }
 
     public float nextFloat() {
-        return ByteBuffer.wrap(this.read(4)).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+        return ByteBuffer.wrap(this.read(4)).order(byteOrder).getFloat();
     }
 
     public int skipTo(byte[][] needles, int limit) {

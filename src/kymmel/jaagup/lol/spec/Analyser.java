@@ -1,4 +1,4 @@
-package kymmel.jaagup.lol.spec.util;
+package kymmel.jaagup.lol.spec;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;

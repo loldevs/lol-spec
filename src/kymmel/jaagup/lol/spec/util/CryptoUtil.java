@@ -1,4 +1,4 @@
-package kymmel.jaagup.lol.spec.misc;
+package kymmel.jaagup.lol.spec.util;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -12,7 +12,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.zip.GZIPInputStream;
 
-public class Crypto {
+public class CryptoUtil {
 
     public static byte[] decrypt(byte[] encrypted, byte[] key) throws NoSuchPaddingException, NoSuchAlgorithmException,
             BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
