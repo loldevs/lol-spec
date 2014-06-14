@@ -3,12 +3,6 @@ package kymmel.jaagup.lol.spec;
 import kymmel.jaagup.lol.spec.domain.ByteInputStream;
 import kymmel.jaagup.lol.spec.domain.Keyframe;
 import kymmel.jaagup.lol.spec.exceptions.PacketParseException;
-import kymmel.jaagup.lol.spec.util.FileUtil;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class StrictParser {
 
@@ -221,26 +215,4 @@ public class StrictParser {
         keyframe.addPlayer(player);
     }
 
-    public static void main(String[] args) throws IOException {
-
-        File[] files = new File("analysis/keyframes/").listFiles();
-        assert files != null;
-        long parseTime = 0L;
-        int parseNum = 0;
-        int failedNum = 0;
-        List<Keyframe> keyframes = new ArrayList<Keyframe>();
-
-        for(File file : files) {
-            System.out.println(file.getName());
-            parseNum++;
-            ByteInputStream stream = new ByteInputStream(FileUtil.readFileBytes(file.getCanonicalPath()));
-            try {
-                keyframes.add(StrictParser.parseKeyframe(stream));
-            } catch(PacketParseException e) {
-                failedNum++;
-            }
-        }
-        System.out.println("Failed " + failedNum + "/" + parseNum);
-
-    }
 }
